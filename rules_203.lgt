@@ -711,7 +711,11 @@ END_RULE; -- dependent_instantiable_action_directive
 
 	scope([action_directive]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ ( action_directive::descendant_instance(Ad),
+	        \+ (directed_action::descendant_instance(Da),Da::directive(Ad))).
 
 :- end_object.
 
@@ -735,7 +739,11 @@ END_RULE; -- dependent_instantiable_approval_status
 
 	scope([approval_status]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ ( approval_status::descendant_instance(As),
+	        \+ (approval::descendant_instance(Ap),Ap::status(As))).
 
 :- end_object.
 
@@ -759,7 +767,11 @@ END_RULE; -- dependent_instantiable_certification_type
 
 	scope([certification_type]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (certification_type::descendant_instance(Ct),
+	        \+ (certification::descendant_instance(Cr), Cr::kind(Ct))).
 
 :- end_object.
 
@@ -783,7 +795,12 @@ END_RULE; -- dependent_instantiable_contract_type
 
 	scope([contract_type]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (contract_type::descendant_instance(Ct),
+	        \+ (contract::descendant_instance(Cr), Cr::kind(Ct))).
+	
 
 :- end_object.
 
@@ -807,7 +824,12 @@ END_RULE; -- dependent_instantiable_date
 
 	scope([date]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ ( date::descendant_instance(Date),
+	       \+ ( (approval_date_time::descendant_instance(Adt),Adt::date_time(Date));
+	            (date_and_time::descendant_instance(Da),Da::date_component(Date)))).
 
 :- end_object.
 
@@ -831,7 +853,11 @@ END_RULE; -- dependent_instantiable_date_time_role
 
 	scope([date_time_role]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (date_time_role::descendant_instance(Dtr),
+	       \+ (date_and_time_assignment::descendant_instance(Dta),Dta::role(Dtr))).
 
 :- end_object.
 
@@ -855,7 +881,11 @@ END_RULE; -- dependent_instantiable_document_type
 
 	scope([document_type]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (document_type::descendant_instance(Dt),
+	        \+ (document::descendant_instance(Doc),Doc::kind(Dt))).
 
 :- end_object.
 
@@ -879,8 +909,13 @@ END_RULE; -- dependent_instantiable_named_unit
 
 	scope([named_unit]).
 
-	global_rules([]).
+	global_rules([wr1]).
 
+    global_rule(wr1) :-
+        \+ (named_unit::descendant_instance(Nu),
+            \+ ((global_unit_assigned_context::descendant_instance(Guac),Guac::units(UnitSet),list::member(UnitSet,Nu));
+                (measure_with_unit::descendant_instance(Mwu),Mwu::unit_component(Nu)))).
+        
 :- end_object.
 
 
@@ -904,8 +939,11 @@ END_RULE; -- dependent_instantiable_person_and_organization_role
 
 	scope([person_and_organization_role]).
 
-	global_rules([]).
+	global_rules([wr1]).
 
+    global_rule(wr1) :-
+        \+ (person_and_organization_role::descendant_instance(Por),
+           \+ (person_and_organization_assignment::descendant_instance(Poa),Poa::role(Por))).
 :- end_object.
 
 
@@ -917,6 +955,16 @@ WHERE
 END_RULE; -- dependent_instantiable_representation_item
 */
 
+/*
+Note added 8 May 2008 by VM
+This rule is not implemented. 
+It is redundant, within this schema, in that the domain rule
+representation_item::wr1 (see entities_203.lgt); if satisfied for
+every representation_item, implies that this global rule is satisfied
+
+The converse is not true; this global rule, if satisfied, does not
+imply that representation_item::wr1 is satisfied for every representation_item
+*/
 :- object(dependent_instantiable_representation_item,
 	extends(express_global_rule)).
 
@@ -953,7 +1001,11 @@ END_RULE; -- dependent_instantiable_security_classification_level
 
 	scope([security_classification_level]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (security_classification_level::descendant_instance(Scl),
+	       \+ (security_classification::descendant_instance(Sc), Sc::security_level(Scl))).
 
 :- end_object.
 
@@ -978,7 +1030,15 @@ END_RULE; -- dependent_instantiable_shape_representation
 
 	scope([shape_representation]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (shape_representation::descendant_instance(Sr),
+	      \+ ((degenerate_pcurve::descendant_instance(Dp),Dp::reference_to_curve(Sr));
+              (pcurve::descendant_instance(Pc),Pc::reference_to_curve(Sr));
+              (property_definition_representation::descendant_instance(Pdr),Pdr::used_representation(Sr));
+              (representation_map::descendant_instance(Rm),Rm::mapped_representation(Sr));
+              (representation_relationship::descendant_instance(Rr),(Rr::rep_1(Sr);Rr::rep_2(Sr))))).
 
 :- end_object.
 
@@ -997,6 +1057,16 @@ WHERE
 	   TYPEOF (pd.frame_of_reference))))) = 0;
 END_RULE; -- design_context_for_property
 */
+/*
+translated: VM 8 May 2008
+
+For all pd (pd is a product_definition):
+If pd is the value of a definition attribute of a property_definition; or
+pd is the value of the related_product_definition attribute of an instance pdr (product_definition_relationship), with
+pdr itself the value of a definition attribute;
+THEN pd must have "design_context" as the value of its frame_of_reference
+
+*/
 
 :- object(design_context_for_property,
 	extends(express_global_rule)).
@@ -1009,7 +1079,14 @@ END_RULE; -- design_context_for_property
 
 	scope([product_definition]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (product_definition::descendant_instance(Pd),
+	        \+ ( ((property_definition::descendant_instance(Pp),Pp::definition(pd));
+	              (product_definition_relationship::descendant_instance(Pdr),Pdr::related_product_definition(Pd),
+	               property_definition::descendant_instance(Pq),Pq::definition(Pdr))),
+	               \+Pd::frame_of_reference(design_context))).
 
 :- end_object.
 
@@ -1032,6 +1109,13 @@ WHERE
 END_RULE; -- document_to_product_definition
 */
 
+/*
+Translated VM 8 May 2008
+
+For every cc_design_specification_reference (Cdsr):
+if it's document (Doc) is a value of the relating_document of document_relationship, then every item in Cdst list 
+of specified_items must be a product_definition
+*/
 :- object(document_to_product_definition,
 	extends(express_global_rule)).
 
@@ -1043,7 +1127,16 @@ END_RULE; -- document_to_product_definition
 
 	scope([cc_design_specification_reference, product_definition]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (cc_design_specification_reference::descendant_instance(Cdsr),
+	        Cdsr::assigned_document(Doc),
+	        document_relationship::descendant_instance(Dr),
+	        Dr::relating_document(Doc),
+	        Cdsr::items(SpecifiedItems),
+	        list::member(SpecifiedItems, Item),
+	        \+ product_definition::descendant_instance(Item)).
 
 :- end_object.
 
@@ -1094,6 +1187,11 @@ WHERE
 END_RULE; -- geometric_representation_item_3d
 */
 
+/*
+Interpretation: For every geometric_representation_item:
+Either it is 3-dimensional; or it is only referred to in the items attribute of
+a definitional_representation instance
+*/
 :- object(geometric_representation_item_3d,
 	extends(express_global_rule)).
 
@@ -1130,7 +1228,11 @@ END_RULE;
 
 	scope([parametric_representation_context]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (parametric_representation_context::descendant_instance(Prc),
+	        \+ (representation::descendant_instance(Rep), Rep::context_of_items(Prc))).
 
 :- end_object.
 
@@ -1193,6 +1295,11 @@ WHERE
 END_RULE; -- no_shape_for_make_from
 */
 
+/*
+Translated VM 8 May 2008
+For all design_make_from_relationship (Dmfr):
+There is no product_definition_shape whose definition value is Dmfr
+*/
 :- object(no_shape_for_make_from,
 	extends(express_global_rule)).
 
@@ -1204,7 +1311,12 @@ END_RULE; -- no_shape_for_make_from
 
 	scope([design_make_from_relationship]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (design_make_from_relationship::descendant_instance(Dmfr),
+	        product_definition_shape::descendant_instance(Shape),
+	        Shape::definition(Dmfr)).
 
 :- end_object.
 
@@ -1221,6 +1333,12 @@ WHERE
 END_RULE; -- no_shape_for_supplied_part
 */
 
+/*
+Translated 8 May 2008
+Similar to rule no_shape_for_make_from
+For all supplied_part_relationship Spr
+there is no product_definition_shape whose definition is Spr
+*/
 :- object(no_shape_for_supplied_part,
 	extends(express_global_rule)).
 
@@ -1232,7 +1350,13 @@ END_RULE; -- no_shape_for_supplied_part
 
 	scope([supplied_part_relationship]).
 
-	global_rules([]).
+	global_rules([wr1]).
+	
+	global_rule(wr1) :-
+	    \+ (supplied_part_relationship::descendant_instance(Spr),
+	        product_definition_shape::descendant_instance(Shape),
+	        Shape::definition(Spr)).
+
 
 :- end_object.
 
@@ -2514,7 +2638,10 @@ END_RULE; -- subtype_mandatory_shape_representation
 
 	global_rules([wr1]).
 
-	global_rule(wr1) :- \+ (shape_representation::descendant_instance(Sr), not_type(Sr) ).
+	global_rule(wr1) :- \+ (shape_representation::descendant_instance(Sr), 
+	                        not_type(Sr), 
+	                        not_all_placements(Sr), 
+	                        not_shape_aspect(Sr) ).
 	    
     not_type(X) :- 
         \+ (list::member(Entity,[   advanced_brep_shape_representation,
@@ -2527,13 +2654,13 @@ END_RULE; -- subtype_mandatory_shape_representation
             Entity::descendant_instance(X)).
 
             
-    not_all_placements(_) :- 
+    not_all_placements(Sr) :- 
         Sr::items(Items),
         list::member(Item,Items),
         \+ axis2_placement_3d::descendant_instance(Item),!.
 
         
-    not_shape_aspect(_) :- 
+    not_shape_aspect(Sr) :- 
         shape_definition_representation::descendant_instance(Sdr),
         Sdr::used_representation(Sr),
         Sdr::definition(Property),
