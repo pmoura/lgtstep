@@ -198,3 +198,20 @@
     luminous_intensity_exponent(E)          :- parameter(7, X), E is X * 1.0.
 
 :- end_object.
+
+
+:- object(si_unit(_Prefix, _Name),
+	imports(validated),
+	instantiates(si_unit)).
+
+	:- info([
+		version is 1.0,
+		author is 'Vincent Marchetti and Paulo Moura',
+		date is 2008/05/14,
+		comment is '.',
+		parnames is ['Prefix', 'Name']]).
+
+	prefix(Prefix) :- parameter(1, Prefix).
+	name(Name) :- parameter(2, Name).
+
+:- end_object.
