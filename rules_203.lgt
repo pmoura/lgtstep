@@ -227,7 +227,7 @@ END_RULE; -- as_required_quantity
 	global_rule(wr1) :-		% IS THIS CORRECT?!?
 		\+ (	measure_with_unit::descendant_instance(M),
 				M::value_component(typed_value(descriptive_measure, Vc)),
-				Vc =\= as_required
+				Vc \== as_required
 			).
 
 :- end_object.
