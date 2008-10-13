@@ -1,0 +1,50 @@
+#  The iconv library whose interface is declared in iconv.h is used to handle unicode conversions
+#  There are, however, two differing "standard" definitions out there, which differ in the signature
+#  of the iconv function. They differ in whether or not the second argument is declared 'const'
+#  
+#  From version 0x0109 included in the gnu LIBICONV library have the declaration:
+#  extern size_t iconv (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
+#  
+#  while from 0x010B have:
+#  extern size_t iconv (iconv_t cd,  char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
+#  
+#  This library is used in the source code IConvClass.cpp. Control compilation through a preprocessor macro ICONV_CONST_ARG2
+#  To accommodate these differing definitions: use the compile time preprocessor macro ICONV_CONST_ARG2
+#  It should be set to 1 if this systems iconv.h declaration is like that of version 0109 above, and ICONV_CONST_ARG2
+#  should be 0 if the declaration is like that of 010B above.
+#  
+#  The default is for ICONV_CONST_ARG2 to be 1
+
+# The following script sets a value for  ICONV_CONST_ARG2 by attempting compilation of
+# a simple c++ source code file using either signature for iconv, and seeing which option 
+# compiles without errors or warning
+
+TMPSRC=`mktemp XXXX`
+TMPOBJ=`mktemp XXXX`
+
+function testcomp()  { gcc -c -Werror -x c++ -o $TMPOBJ $1 2> /dev/null ;}
+
+echo "#include <iconv.h>" > $TMPSRC
+echo "int func(){iconv( (iconv_t) 0, ( const char **) 0 , 0, (char **) 0, (size_t *) 0);}" >> $TMPSRC
+
+testcomp $TMPSRC; CONST_DECL=$?
+
+echo "#include <iconv.h>" > $TMPSRC
+echo "int func(){iconv( (iconv_t) 0, ( char **) 0 , 0, (char **) 0, (size_t *) 0);}" >> $TMPSRC
+
+testcomp $TMPSRC; NON_CONST_DECL=$?
+
+if [ -a $TMPSRC ]; then rm $TMPSRC; fi
+if [ -a $TMPOBJ ]; then rm $TMPOBJ; fi
+
+
+if [[ $CONST_DECL==0 && $NON_CONST_DECL != 0 ]]; then
+    ICONV_CONST_ARG2=1
+elif [[ $CONST_DECL != 0  && $NON_CONST_DECL == 0 ]]; then
+    ICONV_CONST_ARG2=0
+else
+    ICONV_CONST_ARG2=1
+fi;
+
+sed -e "s=@ICONV_CONST_ARG2=$ICONV_CONST_ARG2=" < Makefile.am > Makefile
+

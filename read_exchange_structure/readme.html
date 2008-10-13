@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>read_exchange_structure</title>
+<style type="text/css">
+body {margin-top: 36pt; margin-left: 24pt; margin-right:24pt;}
+h2 {font-size: 150%; font-weight: bold;}
+h3 {font-size: 120%; font-weight: bold;}
+h4 {font-size: 100%; font-weight: bold;}
+div.code {
+font-family:monospace;
+white-space: pre;
+}
+span.code {font-family: monospace;}
+
+</style>
+</head>
+<body>
+<h2>read_exchange_structure program</h2>
+Vincent Marchetti<br/>
+email: <a href="mailto:vmarchetti@kshell.com">vmarchetti@kshell.com</a><br/>
+site:  <a href="http://www.kshell.com">http://www.kshell.com</a><br/>
+<h3>Introduction</h3>
+<p>
+read_exchange_structure is a command-line program which reads a text STEP Part 21 data exchange file.
+In the default (no command line arguments) the program reads from standard input and exits silently, with return code 0. Options for interesting output  is selected by command line arguments and can be one of:
+</p>
+
+<ul>
+<li>A collection of Prolog ground clauses</li>
+<li>A set of Logtalk objects</li>
+<li>A summary of the types of  instances present in the Part 21 file.</li>
+</ul>
+
+<p>
+The program returns with error code 1 if a syntax or semantic error is encountered reading either the Part 21 file or associated EXPRESS schema file. Other run-time errors result in error code 2. In either case, messages are written to standard error stream.
+</p>
+
+<p>
+At run time the program  reads the EXPRESS text file defining the schema which governs the data model exchanged in the Part 21 file. The schema file is specified either through a command line argument; or through a <a href="#schema_catalog">schema-catalog</a> method. The schema-catalog method requires setting an environment variable and preparing an XML-format file specifying the locations of schema files.
+</p>
+
+<p>
+This program is written in C++ and is compilable with the <a href="http://gcc.gnu.org/">GCC</a> 3.3 compiler. Source code and makefiles are included in this distribution.
+This program uses the open-source <a href="http://xmlsoft.org/">libxml2</a> (XML parser and toolkit) library and the <a href="http://www.boost.org/">Boost</a> (C++ utilities) library, both of  which must be installed prior to the configure-compile steps described below.
+</p>
+
+<p>
+In a complete installation the program can be run from the command line; as an example
+</p>
+<div class="code">
+read_exchange_structure -p
+</div>
+<p>
+reads an exchange structure from standard input stream and writes  Prolog clauses to the standard output stream. The full set of command line options is described in <a href="#command_options">Appendix B</a>.
+</p>
+
+<p>
+This software is &#169; 2006 by Vincent Marchetti (<a href="mailto:vmarchetti@kshell.com">vmarchetti@kshell.com</a>) and is distributed under the terms of the <a href="http://www.gnu.org/licenses/gpl.html">GNU public license</a>.
+</p>
+
+<h3>EXPRESS schema management</h3>
+This program reads an EXPRESS schema file at run-time to allow interpretation of a STEP Part 21 exchange file. There are two ways in which the program may determine what schema file to read:
+<ul>
+<li>
+The command line option  <span class="code">-s <i>schema_file</i></span> directs the program to read the specified EXPRESS schema file.
+</li>
+<li>
+The program may determine the EXPRESS schema from the attribute values of the <span class="code">FILE_SCHEMA</span> entity of the HEADER section of the exchange file. The program uses a configuration file to associate a file path with a schema identifier. This configuration file uses xml syntax as described in <a href="#schema_catalog">Appendix A</a>. The location of this configuration file is determined by either of:
+<ul>
+<li>
+A command line option <span class="code">-c <i>configuration_file</i></span>.
+</li>
+<li>
+The location of the configuration file may be specified by the environment variable <span class="code">EXPRESS_SCHEMA_CATALOG</span>.
+</li>
+</ul>
+</li>
+</ul>
+
+If the program exits with a syntax error it may be difficult to determine whether the error message refers to a syntax error encountered in the Part 21 exchange file or in the EXPRESS schema file. The command line option <span class="code">-v <i>schema_file</i></span> directs the program to read only the schema file and exit (silently) if no error is encountered; if the schema file passes this test it can be determined that subsequent error messages refer to the exchange file.
+
+
+
+<h3>Compilation and installation</h3>
+
+<p>
+The read_exchange_structure program is compiled  with the  execution from the command line of the following commands (with the top directory of the distribution as the working directory):
+</p>
+<pre>
+./configure
+make
+</pre>
+
+An additional make target 'test' will run the executable  against a sample STEP file included in this distribution.
+
+Compilation requires that the search paths for the gcc compiler (particularly header file search and shared library search paths) are configured so that the Boost  and libxml header files can be found with preprocessor directives:
+<pre>
+<p>
+#include &lt;boost/filesystem/path.hpp&gt;
+#include &lt;libxml/parser.h&gt; 
+</p>
+</pre>
+
+The linker must also be able to find the following shared libraries:
+<ul>
+<li>libboost_regex </li>
+<li>libboost_filesystem </li>
+<li>libboost_program_options </li>
+<li>libboost_iostreams </li>
+<li>libxml2</li>
+</ul>
+
+
+
+<a name="schema_catalog"/>
+<h3>Appendix A: schema-catalog</h3>
+<p>
+A schema-catalog file is used to locate an EXPRESS schema for a Part 21 file at run time, based on the schema identifiers in the Part 21 file's HEADER section. A schema-catalog file matches the schema identifier label with a file system path. The comparison between the schema identifier in the Part 21 file and the label in the schema-catalog is case-insensitive. The path in the schema-catalog will be resolved by the program relative to the location of the schema-catalog file. A typical installation will put the schema-catalog file and the schema files in the same directory; then the path data may simply be the base-name of the schema file. 
+</p>
+
+<p>
+Example of a schema-catalog file, including embedded DTD:
+</p>
+
+<div class="code">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE schema_catalog [
+&lt;!ELEMENT schema_catalog (schema)*&gt;
+&lt;!ELEMENT schema (description? , identifier+)&gt;
+&lt;!ATTLIST schema path CDATA #REQUIRED&gt;
+&lt;!ATTLIST schema status CDATA #IMPLIED&gt;
+&lt;!ELEMENT description (#PCDATA)&gt;
+&lt;!ELEMENT identifier (label)&gt;
+&lt;!ELEMENT label (#PCDATA)&gt;
+]&gt;
+&lt;schema_catalog&gt;
+
+&lt;schema path="10303-203-aim-long.exp" status="IS"&gt;
+&lt;description&gt;
+This is the ISO 10303:203 Am1 (2000) EXPRESS definition
+&lt;/description&gt;
+&lt;identifier&gt;&lt;label&gt;CONFIG_CONTROL_DESIGN&lt;/label&gt;&lt;/identifier&gt;
+&lt;identifier&gt;&lt;label&gt;AP203&lt;/label&gt;&lt;/identifier&gt;
+&lt;/schema&gt;
+
+&lt;/schema_catalog&gt;
+</div>
+
+<h4>schema-catalog notes</h4>
+<ul>
+<li>The description element and the status attribute of the schema element are optional and are not used by the program.</li>
+<li>The label element is buried inside an identifier element because future versions will allow for identifying a schema through its <a href="http://www.alvestrand.no/domen/objectid/index.html">object identifier</a>; the identifier element will then contain an object_identifier element instead of a label.</li>
+</ul>
+
+<a name="command_options"/>
+<h3>Appendix B: Command line options</h3>
+<dl>
+<dt>-h | --help</dt>
+<dd>display help information</dd>
+
+<dt>-f | --file <i>filename</i></dt>
+<dd>reads input from the file <i>filename</i> rather than standard input</dd>
+
+<dt>-o | --output <i>filename</i></dt>
+<dd>writes output to the file <i>filename</i> rather than standard output</dd>
+
+<dt>-v   <i>filename</i></dt>
+<dd>reads the passed filename as an EXPRESS schema, used to verify that this file
+can be used by this program to control reading of Part 21 files. No Part 21 file is read; and any
+errors reported pertain to reading the EXPRESS schema file.</dd>
+
+<dt>-l   <i>label</i></dt>
+<dd>invokes the schema-catalog method to determine the file path of the
+EXPRESS schema identified by the label argument. Writes the file path to standard output.</dd>
+
+<dt>-p  </dt>
+<dd>generate prolog output.</dd>
+
+<dt>-g  </dt>
+<dd>generate logtalk output.</dd>
+
+<dt>-e  </dt>
+<dd>generates output summarizing instances by their entities.</dd>
+
+
+<dt>-s | --schema <i>filename</i></dt>
+<dd>Use the passed filename as an EXPRESS schema to interpret the Part 21 file.
+This file will be used regardless of the schema identifiers specified in the
+Part 21 HEADER section.</dd>
+
+<dt>-c | --catalog <i>filename</i></dt>
+<dd>Use the passed filename as a schema-catalog to locate schema files. Use of this
+option is an alternative to specifying the catalog file in the EXPRESS_SCHEMA_CATALOG
+environment variable. In either case, the location of the catalog file (its directory) is
+used to resolve relative locations specified in the catalog file for the schema files.</dd>
+
+<dt>-x  </dt>
+<dd>report errors resulting from syntax/semantic errors in the schema or Part 21
+files as xml-formatted strings</dd>
+
+</dl>
+
+</body>
+</html>
