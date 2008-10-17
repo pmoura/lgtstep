@@ -98,15 +98,15 @@ int main(int argc, char ** argv){
 	auto_ptr<options_description> _common_optionsPtr = common_options();
 	desc.add(*_common_optionsPtr);
 
-	desc.add_options()("v",	value< string >(),
+	desc.add_options()("verify_schema,v",	value< string >(),
 	                   "verify the argument (path) can be read as a schema, return schema name to stdout")
-	                  ("l", value< string >(),
+	                  ("locate_schema,l", value< string >(),
 	                   "locate schema (by identifier), return path to stdout")
-										("p",			"output prolog facts")
-										("g",     "output logtalk objects")
-										("m",				"print schema name")
-										("e", "print entity sets content")
-										("x",	"print exception messages in xml format")
+										("prolog,p",			"output prolog facts")
+										("logtalk,g",     "output logtalk objects")
+										("model,m",				"print schema name")
+										("entity_sets,e", "print entity sets content")
+										("xml_message,x",	"print exception messages in xml format")
 										("version","print version");
 
 	store( parse_command_line(argc,argv,desc), vm);
