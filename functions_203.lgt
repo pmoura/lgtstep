@@ -26,9 +26,9 @@ from AP 203
 :- object(acyclic_graph).
 
 	:- info([
-		version is 1.0,
+		version is 1.01,
 		author is 'Vincent Marchetti and Paulo Moura',
-		date is 2006/02/04,
+		date is 2019/03/11,
 		comment is '.']).
 
 	:- public(true/1).
@@ -55,7 +55,7 @@ from AP 203
 
 	acyclic_path([X | Rest]) :-
 		\+ list::member(X, Rest),
-		forall(::graph_edge(X, Y), ::acyclic_path([Y, X| Rest])).
+		forall(::graph_edge(X, Y), acyclic_path([Y, X| Rest])).
 
 :- end_object.
 
@@ -582,7 +582,7 @@ END_FUNCTION; -- bag_to_set
 		 argnames is ['Bag', 'Set']]).
 
 	eval(Bag, Set) :-
-		{sort(Bag, Set)}.	
+		sort(Bag, Set).
 
 :- end_object.
 
@@ -1104,6 +1104,7 @@ END_FUNCTION; -- closed_shell_reversed
 			Reversed = oriented_closed_shell('', ShellElement, Orientation)
 		;	Shell::ancestor(closed_shell) ->
 			Reversed = oriented_closed_shell('', Shell, false)
+		;	fail
 		).
 
 :- end_object.
@@ -1357,7 +1358,7 @@ END_FUNCTION; -- constraints_param_b_spline
 		K is Degree + Up_cp + 2,
 
 		check_multiplicities(Knot_mult, Degree),
-		{sort(Knots, Knots)}.	% Knots is a list of strictly increasing knot values
+		sort(Knots, Knots).	% Knots is a list of strictly increasing knot values
  
 		
 	check_multiplicities([M1| More], Degree) :-
@@ -2164,6 +2165,7 @@ END_FUNCTION; -- gbsf_check_curve
 				true
 			;	true(Basis)
 			)
+		;	fail
 		).
 
 	all_true([]).
@@ -2178,6 +2180,7 @@ END_FUNCTION; -- gbsf_check_curve
 			gbsf_check_surface::true(Geometry)
 		;	Geometry::ancestor(pcurve) ->
 			true(Geometry)
+		;	fail
 		),
 		check_associated_geometry(Geometries).
 
@@ -2314,6 +2317,7 @@ END_FUNCTION; -- gbsf_check_point
 			gbsf_check_curve::true(Item),
 			Point::basis_surface(Surface),
 			gbsf_check_surface::true(Surface)
+		;	fail
 		).
 
 :- end_object.
@@ -2536,17 +2540,18 @@ END_FUNCTION; -- get_basis_surface
 			Segment::parent_curve(Parent),
 			eval(Parent, Surfs),
 			segments_surfaces(Segments, Surfs, Surfaces)
+		;	fail
 		).
 
 	geometry_surfaces([], Surfs, Surfaces) :-
-		{sort(Surfs, Surfaces)}.
+		sort(Surfs, Surfaces).
 	geometry_surfaces([Geometry| Geometrys], Surfs, Surfaces) :-
 		associated_surface::eval(Geometry, GeometrySurfaces),
 		set::union(Surfs, GeometrySurfaces, Surfs2),
 		geometry_surfaces(Geometrys, Surfs2, Surfaces).
 
 	segments_surfaces([], Surfs, Surfaces) :-
-		{sort(Surfs, Surfaces)}.
+		sort(Surfs, Surfaces).
 	segments_surfaces([Segment| Segments], Surfs, Surfaces) :-
 		Segment::parent_curve(Parent),
 		eval(Parent, ParentSurfaces),
@@ -2746,7 +2751,7 @@ END_FUNCTION; -- list_to_array
 		comment is '.',
 		argnames is ['List', 'Low', 'U', 'Array']]).
 
-	eval(List, Low, U, Array) :-
+	eval(List, _Low, _U, Array) :-
 		List = Array.
 
 :- end_object.
@@ -2779,7 +2784,7 @@ END_FUNCTION; -- list_to_set
 		 argnames is ['List', 'Set']]).
 
 	eval(List, Set) :-
-		{sort(List, Set)}.
+		sort(List, Set).
 
 :- end_object.
 
@@ -2818,7 +2823,7 @@ END_FUNCTION; -- make_array_of_array
 		comment is '.',
 		argnames is ['Data', '', '', '', '', 'Array']]).
 
-	eval(Data, 0, UU, 0, VU, Weights) :-
+	eval(Data, 0, _UU, 0, _VU, Weights) :-
 		Data = Weights.		% JUST A TEMPORARY WORKAROUND
 
 :- end_object.
@@ -3163,9 +3168,9 @@ END_FUNCTION; -- normalise
 	imports(geometry_functions)).
 
 	:- info([
-		version is 1.0,
+		version is 1.01,
 		author is 'Vincent Marchetti and Paulo Moura',
-		date is 2006/02/04,
+		date is 2019/03/11,
 		comment is '.']).
 
 	:- public(eval/2).
@@ -3179,7 +3184,7 @@ END_FUNCTION; -- normalise
 		Vector::magnitude(Mag),
 		Mag > 0.0,
 		Vector::orientation(Tmp),
-		::eval(Tmp, Direction).
+		eval(Tmp, Direction).
 		
 	eval(Direction, direction('', DirectionRatios)) :-
 		Direction::ancestor(direction), !,
@@ -3233,6 +3238,7 @@ END_FUNCTION; -- open_shell_reversed
 			Reversed = oriented_open_shell('', ShellElement, Orientation)
 		;	Shell::ancestor(open_shell) ->
 			Reversed = oriented_open_shell('', Shell, false)
+		;	fail
 		).
 
 :- end_object.
@@ -3963,6 +3969,7 @@ END_FUNCTION; -- valid_geometrically_bounded_wf_curve
 					;	Curve::ancestor(composite_curve) ->
 						Curve::segments(Segments),
 						check_segments(Segments)
+					;	fail
 					)
 				)
 			)
@@ -4007,9 +4014,9 @@ END_FUNCTION; -- valid_geometrically_bounded_wf_point
 :- object(valid_geometrically_bounded_wf_point).
 
 	:- info([
-		version is 1.0,
+		version is 1.01,
 		author is 'Vincent Marchetti and Paulo Moura',
-		date is 2006/02/04,
+		date is 2019/03/11,
 		comment is '.']).
 
 	:- public(true/1).
@@ -4021,13 +4028,13 @@ END_FUNCTION; -- valid_geometrically_bounded_wf_point
 	true(Point) :-
 		(	Point::ancestor(cartesian_point) ->
 			true
-		;	(	Point::ancestor(point_on_curve) ->
-				Point::basis_curve(Curve),
-				valid_geometrically_bounded_wf_curve::true(Curve)
-			;	Point::ancestor(point_replica) ->
-				Point::parent_pt(Parent),
-				true(Parent)
-			)
+		;	Point::ancestor(point_on_curve) ->
+			Point::basis_curve(Curve),
+			valid_geometrically_bounded_wf_curve::true(Curve)
+		;	Point::ancestor(point_replica) ->
+			Point::parent_pt(Parent),
+			true(Parent)
+		;	fail
 		).
 
 :- end_object.
@@ -4366,6 +4373,7 @@ END_FUNCTION; -- valid_wireframe_edge_curve
 		;	Curve::ancestor(offset_curve_3d) ->
 			Curve::basis_curve(Basis),
 			true(Basis)
+		;	fail
 		).
 
 	basic_curve(Curve) :-

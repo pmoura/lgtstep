@@ -2,9 +2,9 @@
 :- object(data_model).
 
 	:- info([
-		version is 1.2,
+		version is 1.3,
 		author is 'Vincent Marchetti and Paulo Moura',
-		date is 2007/9/23,
+		date is 2019/03/11,
 		comment is 'Predicates for validation of a data model.']).
 
 	:- threaded.
@@ -63,6 +63,7 @@
 			;	express_global_rules::validate(RuleFailures)
 			),
 			InstanceFailures = skipped
+		;	fail
 		).
 
 :- end_object.
@@ -278,6 +279,7 @@
 		;	Validate == domain_rules ->
 			validate_domain_rules(DomainRuleFailures),
 			AttributeFailures = skipped
+		;	fail
 		),
 		memberchk(print(Print), Options),
 		print_instance_results(Print, AttributeFailures, DomainRuleFailures).
@@ -358,7 +360,7 @@
 
 	validate_attribute(one, Name, Type, Acc, Acc2) :-
 		Goal =.. [Name, Value],
-		(	call(::Goal) ->
+		(	::Goal ->
 			(	catch(Type::valid(Value), Error, report_error(Type, Error)) ->
 				Acc2 = Acc
 			;	Acc2 = [invalid(Name, Type, Value)| Acc]
@@ -368,7 +370,7 @@
 
 	validate_attribute(zero_or_one, Name, Type, Acc, Acc2) :-
 		Goal =.. [Name, Value],
-		(	call(::Goal) ->
+		(	::Goal ->
 			(	catch(Type::valid(Value), Error, report_error(Type, Error)) ->
 				Acc2 = Acc
 			;	Acc2 = [invalid(Name, Type, Value)| Acc]

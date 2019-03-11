@@ -1,3 +1,4 @@
+
 :- object(certification,
 	instantiates(express_entity),
 	specializes(express_object)).
@@ -2042,7 +2043,7 @@
 
 :- object(poly_loop,
 	instantiates(express_entity),
-	specializes(loop,geometric_representation_item)).
+	specializes((loop,geometric_representation_item))).
 
 	:- info([
 		version is 1.0,
@@ -2050,8 +2051,8 @@
 		date is 2006/02/04,
 		comment is '.']).
 
-	:- alias(loop, uses_item_via_attr/2, loop_uses_item_via_attr/2).
-	:- alias(geometric_representation_item, uses_item_via_attr/2, geometric_representation_item_uses_item_via_attr/2).
+	:- alias(loop, [uses_item_via_attr/2 as loop_uses_item_via_attr/2]).
+	:- alias(geometric_representation_item, [uses_item_via_attr/2 as geometric_representation_item_uses_item_via_attr/2]).
 
 	:- public(polygon/1).
 	:- mode(polygon(?express_list_unique(cartesian_point,3,unbounded)), one, explicit).
@@ -3585,7 +3586,7 @@
 
 :- object(edge_loop,
 	instantiates(express_entity),
-	specializes(loop, path)).
+	specializes((loop, path))).
 
 	:- info([
 		version is 1.0,
@@ -3598,8 +3599,8 @@
 
 	domain_rules([wr1]).
 
-	:- alias(loop, uses_item_via_attr/2, loop_uses_item_via_attr/2).
-	:- alias(path, uses_item_via_attr/2, path_uses_item_via_attr/2).
+	:- alias(loop, [uses_item_via_attr/2 as loop_uses_item_via_attr/2]).
+	:- alias(path, [uses_item_via_attr/2 as path_uses_item_via_attr/2]).
 	
 	uses_item_via_attr(Item, Attr) :-
 		::loop_uses_item_via_attr(Item, Attr).
@@ -3624,7 +3625,7 @@
 
 :- object(cartesian_transformation_operator,
 	instantiates(express_entity),
-	specializes(geometric_representation_item, functionally_defined_transformation)).
+	specializes((geometric_representation_item, functionally_defined_transformation))).
 
 	:- info([
 		version is 1.0,
@@ -3649,8 +3650,8 @@
 
 	domain_rules([wr1]).
 
-	:- alias(geometric_representation_item, uses_item_via_attr/2, geometric_representation_item_uses_item_via_attr/2).
-	:- alias(functionally_defined_transformation, uses_item_via_attr/2, functionally_defined_transformation_uses_item_via_attr/2).
+	:- alias(geometric_representation_item, [uses_item_via_attr/2 as geometric_representation_item_uses_item_via_attr/2]).
+	:- alias(functionally_defined_transformation, [uses_item_via_attr/2 as functionally_defined_transformation_uses_item_via_attr/2]).
 	
 	uses_item_via_attr(Item, Attr) :-
 		::geometric_representation_item_uses_item_via_attr(Item, Attr).
@@ -4035,7 +4036,7 @@
 
 :- object(vertex_point,
 	instantiates(express_entity),
-	specializes(vertex,geometric_representation_item)).
+	specializes((vertex,geometric_representation_item))).
 
 	:- info([
 		version is 1.0,
@@ -4049,8 +4050,8 @@
 	uses_item(X) :-
 		::vertex_geometry(X).
 
-	:- alias(vertex, uses_item_via_attr/2, vertex_uses_item_via_attr/2).
-	:- alias(geometric_representation_item, uses_item_via_attr/2, geometric_representation_item_uses_item_via_attr/2).
+	:- alias(vertex, [uses_item_via_attr/2 as vertex_uses_item_via_attr/2]).
+	:- alias(geometric_representation_item, [uses_item_via_attr/2 as geometric_representation_item_uses_item_via_attr/2]).
 	
 	uses_item_via_attr(Item, Attr) :-
 		::vertex_uses_item_via_attr(Item, Attr).
@@ -4586,7 +4587,7 @@
 
 :- object(edge_curve,
 	instantiates(express_entity),
-	specializes(edge, geometric_representation_item)).
+	specializes((edge, geometric_representation_item))).
 
 	:- info([
 		version is 1.0,
@@ -4600,8 +4601,8 @@
 	:- public(same_sense/1).
 	:- mode(same_sense(?express_boolean), one, explicit).
 
-	:- alias(edge, uses_item_via_attr/2, edge_uses_item_via_attr/2).
-	:- alias(geometric_representation_item, uses_item_via_attr/2, geometric_representation_item_uses_item_via_attr/2).
+	:- alias(edge, [uses_item_via_attr/2 as edge_uses_item_via_attr/2]).
+	:- alias(geometric_representation_item, [uses_item_via_attr/2 as geometric_representation_item_uses_item_via_attr/2]).
 
 	uses_item_via_attr(Item, Attr) :-
 		::edge_uses_item_via_attr(Item, Attr).
@@ -4709,7 +4710,7 @@
 
 :- object(face_surface,
 	instantiates(express_entity),
-	specializes(face, geometric_representation_item)).
+	specializes((face, geometric_representation_item))).
 
 	:- info([
 		version is 1.0,
@@ -4723,8 +4724,8 @@
 	:- public(same_sense/1).
 	:- mode(same_sense(?express_boolean), one, explicit).
 
-	:- alias(face, uses_item_via_attr/2, face_uses_item_via_attr/2).
-	:- alias(geometric_representation_item, uses_item_via_attr/2, geometric_representation_item_uses_item_via_attr/2).
+	:- alias(face, [uses_item_via_attr/2 as face_uses_item_via_attr/2]).
+	:- alias(geometric_representation_item, [uses_item_via_attr/2 as geometric_representation_item_uses_item_via_attr/2]).
 
 	uses_item_via_attr(Item, Attr) :-
 		::face_uses_item_via_attr(Item, Attr).
@@ -4891,7 +4892,7 @@
 
 :- object(bounded_pcurve,
 	instantiates(express_entity),
-	specializes(pcurve,bounded_curve)).
+	specializes((pcurve,bounded_curve))).
 
 	:- info([
 		version is 1.0,
@@ -5676,7 +5677,7 @@
 
 :- object(bounded_surface_curve,
 	instantiates(express_entity),
-	specializes(surface_curve,bounded_curve)).
+	specializes((surface_curve,bounded_curve))).
 
 	:- info([
 		version is 1.0,
